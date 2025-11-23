@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Driver Login</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: #f4f0f0;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .box {
+      background: #ffffffcc;
+      width: 350px;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 0 20px #0003;
+    }
+    h2 { color: #300303; }
+    input {
+      width: 90%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #300303;
+      margin: 10px 0;
+    }
+    button {
+      width: 95%;
+      padding: 12px;
+      background: #300303;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+    <h2>Driver Login</h2>
+    <input id="phone" type="text" placeholder="Phone Number" />
+    <input id="password" type="password" placeholder="Password" />
+    <button id="loginBtn">Login</button>
+
+    <br><br>
+    <a href="driver_signup.html">Create Account</a>
+  </div>
+
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD3lgIZ7m8OycFnITe2iA8MUbqvzCoYqRs",
+    authDomain: "arorbustracker-b8416.firebaseapp.com",
+    databaseURL: "https://arorbustracker-b8416-default-rtdb.firebaseio.com",
+    projectId: "arorbustracker-b8416",
+    storageBucket: "arorbustracker-b8416.firebasestorage.app",
+    messagingSenderId: "581927473953",
+    appId: "1:581927473953:web:d34ecc360f06d8e9a56460"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  document.getElementById("loginBtn").onclick = () => {
+
+    let phone = document.getElementById("phone").value.trim();   // FIXED
+    let password = document.getElementById("password").value.trim();
+
+    if (!phone || !password) {
+      alert("Please enter phone and password");
+      return;
+    }
+
+    get(ref(db, "drivers/" + phone)).then((snap) => {
+      if (!snap.exists()) {
+        alert("Account Not Found");
+        return;
+      }
+
+      let data = snap.val();
+
+      if (data.password !== password) {
+        alert("Incorrect Password");
+        return;
+      }
+
+      // Save session
+      localStorage.setItem("driverPhone", phone);
+      localStorage.setItem("driverRoute", data.route);
+
+      // Redirect to panel
+      window.location.href = "driver.html";
+    });
+  };
+</script>
+
+
+</body>
+</html>

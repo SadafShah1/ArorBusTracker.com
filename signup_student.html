@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Sign Up - Aror Bus Tracker</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: #f7f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      width: 350px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    h2 {
+      color: #300303;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      width: 95%;
+      padding: 12px;
+      background-color: #300303;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    a {
+      text-decoration: none;
+      color: #300303;
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>Student Sign Up</h2>
+
+    <input type="email" id="email" placeholder="Email Address" required>
+    <input type="password" id="password" placeholder="Create Password" required>
+
+    <button id="signupBtn">Create Account</button>
+
+    <a href="login_student.html">Back to Login</a>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { 
+      getAuth, createUserWithEmailAndPassword 
+    } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3lgIZ7m8OycFnITe2iA8MUbqvzCoYqRs",
+      authDomain: "arorbustracker-b8416.firebaseapp.com",
+      databaseURL: "https://arorbustracker-b8416-default-rtdb.firebaseio.com",
+      projectId: "arorbustracker-b8416",
+      storageBucket: "arorbustracker-b8416.firebasestorage.app",
+      messagingSenderId: "581927473953",
+      appId: "1:581927473953:web:d34ecc360f06d8e9a56460",
+      measurementId: "G-F1C4DB83VX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("signupBtn").addEventListener("click", () => {
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Account Created! Please Login.");
+          window.location.href = "login_student.html";
+        })
+        .catch((error) => {
+          alert("Sign Up Error: " + error.message);
+        });
+    });
+
+  </script>
+
+</body>
+</html>

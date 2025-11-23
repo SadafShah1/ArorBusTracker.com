@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- APK FIX -->
+  <meta http-equiv="Content-Security-Policy"
+  content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob: gap:;
+  img-src * data: blob:;
+  style-src * 'unsafe-inline';
+  script-src * 'unsafe-inline' *;
+  connect-src *;">
+
+  <title>Student Dashboard - Aror Bus Tracker</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background-color: #f7f4f4;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      width: 100%;
+      background: #300303;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+
+    /* SMALLER LOGO FIX */
+    .top-bar img {
+      height: 28px;
+    }
+
+    .logout-btn {
+      background: #fff;
+      color: #300303;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+    }
+
+    /* ROUTE BOX */
+    .route-box {
+      padding: 15px;
+      background: #fff0f0;
+      margin: 10px;
+      border-radius: 10px;
+      font-size: 17px;
+      color: #300303;
+      font-weight: bold;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #300303;
+      font-size: 15px;
+    }
+
+    /* MAP */
+    #map {
+      height: 530px;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <img src="assets/ArorImage.png" alt="Aror Logo" />
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+
+  <!-- ROUTE SELECTION -->
+  <div class="route-box">
+    Select Bus Route:
+    <select id="studentRoute">
+      <option value="">Select Point</option>
+      <option>Point-C</option>
+      <option>Point-G</option>
+      <option>Point-H</option>
+      <option>Point-J</option>
+      <option>Point-I</option>
+    </select>
+  </div>
+
+  <!-- MAP -->
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Firebase -->
+  <script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3lgIZ7m8OycFnITe2iA8MUbqvzCoYqRs",
+      authDomain: "arorbustracker-b8416.firebaseapp.com",
+      databaseURL: "https://arorbustracker-b8416-default-rtdb.firebaseio.com",
+      projectId: "arorbustracker-b8416",
+      storageBucket: "arorbustracker-b8416.firebasestorage.app",
+      messagingSenderId: "581927473953",
+      appId: "1:581927473953:web:d34ecc360f06d8e9a56460"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    let map;
+    let markers = {};
+    let selectedRoute = null;
+
+    /* INIT MAP */
+    function initMap() {
+      map = L.map("map").setView([27.7139, 68.8384], 13);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+      }).addTo(map);
+    }
+
+    /* LOAD DRIVERS LIVE */
+    function loadDriverLocations() {
+      onValue(ref(db, "drivers"), (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        for (let phone in data) {
+          let d = data[phone];
+
+          if (!d.sharing) continue;
+          if (d.route !== selectedRoute) continue;
+
+          if (!markers[phone]) {
+            markers[phone] = L.marker([d.lat, d.lng]).addTo(map);
+          } else {
+            markers[phone].setLatLng([d.lat, d.lng]);
+          }
+        }
+      });
+    }
+
+    /* WHEN STUDENT SELECTS ROUTE */
+    document.getElementById("studentRoute").addEventListener("change", function () {
+      selectedRoute = this.value;
+      markers = {};
+      loadDriverLocations();
+    });
+
+    /* LOGOUT */
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "login_student.html";
+      });
+    });
+
+    /* LOAD MAP ON START */
+    window.onload = function () {
+      initMap();
+    };
+
+  </script>
+
+</body>
+</html>

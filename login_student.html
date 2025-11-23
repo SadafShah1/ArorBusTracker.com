@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Login - Aror Bus Tracker</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: #f7f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      width: 350px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .logo {
+      width: 100px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #300303;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 95%;
+      padding: 12px;
+      background-color: #300303;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .footer a {
+      text-decoration: none;
+      color: #300303;
+      font-size: 14px;
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-container">
+    <img src="assets/ArorImage.png" class="logo" />
+    <h2>Student Login</h2>
+
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email Address" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="footer">
+      <a href="signup_student.html">Sign Up Here</a>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } 
+      from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+    // Your Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3lgIZ7m8OycFnITe2iA8MUbqvzCoYqRs",
+      authDomain: "arorbustracker-b8416.firebaseapp.com",
+      databaseURL: "https://arorbustracker-b8416-default-rtdb.firebaseio.com",
+      projectId: "arorbustracker-b8416",
+      storageBucket: "arorbustracker-b8416.firebasestorage.app",
+      messagingSenderId: "581927473953",
+      appId: "1:581927473953:web:d34ecc360f06d8e9a56460",
+      measurementId: "G-F1C4DB83VX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Login Successful!");
+          window.location.href = "student.html"; // ← STUDENT DASHBOARD
+        })
+        .catch((error) => {
+          alert("Login Failed: " + error.message);
+        });
+    });
+  </script>
+
+</body>
+</html>

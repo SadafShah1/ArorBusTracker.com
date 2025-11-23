@@ -1,0 +1,17 @@
+{
+  "name": "Aror Bus Tracker",
+  "short_name": "ArorTracker",
+  "description": "Bus tracking system for students, drivers, and admin.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#004aad",
+  "theme_color": "#00c6ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/Arorimages.jpg",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

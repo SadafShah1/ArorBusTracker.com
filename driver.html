@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Panel</title>
+
+  <!-- IMPORTANT for APK -->
+  <meta http-equiv="Content-Security-Policy"
+  content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob: gap:;
+  img-src * data: blob:;
+  style-src * 'unsafe-inline';
+  script-src * 'unsafe-inline' *;
+  connect-src *;">
+
+
+  <style>
+    body {
+      font-family: Poppins, sans-serif;
+      background: #f7f4f4;
+      margin: 0;
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #300303;
+    }
+
+    select {
+      padding: 10px;
+      width: 200px;
+      margin: 10px;
+      border-radius: 6px;
+      border: 1px solid #300303;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      background: #300303;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #map {
+      margin-top: 20px;
+      height: 450px;
+      width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 10px;
+    }
+  </style>
+
+  <!-- Leaflet (HTTPS FIX for APK) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+</head>
+
+<body>
+
+  <h2>Driver Panel</h2>
+
+  <select id="routeSelector">
+    <option value="">Select Bus</option>
+    <option>Point-C</option>
+    <option>Point-G</option>
+    <option>Point-H</option>
+    <option>Point-J</option>
+    <option>Point-I</option>
+  </select>
+
+  <br>
+
+  <button onclick="startSharing()">Start Sharing</button>
+  <button onclick="stopSharing()">Stop Sharing</button>
+
+  <div id="map"></div>
+
+
+  <!-- Firebase -->
+  <script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3lgIZ7m8OycFnITe2iA8MUbqvzCoYqRs",
+      authDomain: "arorbustracker-b8416.firebaseapp.com",
+      databaseURL: "https://arorbustracker-b8416-default-rtdb.firebaseio.com",
+      projectId: "arorbustracker-b8416",
+      storageBucket: "arorbustracker-b8416.firebasestorage.app",
+      messagingSenderId: "581927473953",
+      appId: "1:581927473953:web:d34ecc360f06d8e9a56460"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let driverPhone = localStorage.getItem("driverPhone");
+    let map = L.map("map").setView([27.7139, 68.8384], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+    let watchId = null;
+
+    // START SHARING
+    window.startSharing = function () {
+      const route = document.getElementById("routeSelector").value;
+
+      if (!route) {
+        alert("Please select a route");
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        alert("Your device doesn't support location.");
+        return;
+      }
+
+      watchId = navigator.geolocation.watchPosition((pos) => {
+        update(ref(db, "drivers/" + driverPhone), {
+          route: route,
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          sharing: true
+        });
+      }, 
+      (error) => {
+        alert("Location permission blocked. Please allow location.");
+      },
+      { enableHighAccuracy: true });
+    };
+
+    // STOP SHARING
+    window.stopSharing = function () {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+
+      update(ref(db, "drivers/" + driverPhone), {
+        sharing: false
+      });
+
+      alert("Stopped sharing");
+    };
+
+  </script>
+
+  <!-- Force geolocation permission for WebIntoApp -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(()=>{}, ()=>{}, {enableHighAccuracy:true});
+      }
+    });
+  </script>
+
+</body>
+</html>

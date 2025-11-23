@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Driver Signup - Aror Bus Tracker</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #f8f4f4, #ececec);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #ffffffbb;
+      padding: 30px;
+      width: 350px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #0002;
+      text-align: center;
+    }
+    h2 { color: #300303; }
+    input, select {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #300303;
+    }
+    button {
+      width: 95%;
+      padding: 12px;
+      background: #300303;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #4b0a0a; }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+    <h2>Driver Signup</h2>
+
+    <input type="text" id="phone" placeholder="Phone Number" />
+    <input type="password" id="password" placeholder="Password" />
+
+    <select id="route">
+      <option value="">Select Route</option>
+      <option value="Route 1">Route 1</option>
+      <option value="Route 2">Route 2</option>
+      <option value="Route 3">Route 3</option>
+    </select>
+
+    <button id="signupBtn">Create Account</button>
+    <br><br>
+    <a href="login_driver.html">Already have account? Login</a>
+  </div>
+
+  <script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3lgIZ7m8OycFnITe2iA8MUbqvzCoYqRs",
+      authDomain: "arorbustracker-b8416.firebaseapp.com",
+      databaseURL: "https://arorbustracker-b8416-default-rtdb.firebaseio.com",
+      projectId: "arorbustracker-b8416",
+      storageBucket: "arorbustracker-b8416.firebasestorage.app",
+      messagingSenderId: "581927473953",
+      appId: "1:581927473953:web:d34ecc360f06d8e9a56460"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.getElementById("signupBtn").onclick = () => {
+      let phone = document.getElementById("phone").value;
+      let password = document.getElementById("password").value;
+      let route = document.getElementById("route").value;
+
+      if (!phone || !password || !route) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      set(ref(db, "drivers/" + phone), {
+        password: password,
+        route: route,
+        sharing: false,
+        lat: 0,
+        lng: 0
+      });
+
+      alert("Account Created! Now Login.");
+      window.location.href = "login_driver.html";
+    };
+
+  </script>
+
+</body>
+</html>
